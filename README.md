@@ -17,6 +17,7 @@
 
 The main purpose of this repository is to contain all the necessary files to build and run the [performance optimized Overpass API image](https://github.com/mmd-osm/Overpass-API/tree/test7591) created by [mmd](https://github.com/mmd-osm).
 
+An example of the needed files was obtained from the [wiktorn/Overpass-API](https://github.com/wiktorn/Overpass-API) repository, but it was modified to be adapted to build and run the [mdd-osm/Overpass-API](https://github.com/mmd-osm/Overpass-API).
 
 ---
 ## License
