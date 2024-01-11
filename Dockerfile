@@ -87,6 +87,7 @@ FROM nginx:1.21
 RUN apt-get update -qq \
     && apt-get install --no-install-recommends -y \
         bash \
+        bzip2 \
         curl \
         expat \
         git \
@@ -119,10 +120,11 @@ COPY --from=builder /overpass/src/rules /opt/overpass/rules
 RUN addgroup overpass \
     && adduser --home /db --disabled-password --gecos overpass --ingroup overpass overpass
 
-
+# Clone lhbelfanti/overpass-api repository
 RUN git clone --depth 1 https://github.com/lhbelfanti/overpass-api scripts \
     && cd scripts
 
+# Install python dependencies
 COPY requirements.txt /opt/overpass/
 
 RUN python3 -m venv /opt/overpass/venv \
@@ -137,10 +139,12 @@ RUN mkdir -p /db/diffs \
 RUN chown nginx:nginx /nginx \
     && chown -R overpass:overpass /db
 
+# Copy configuration files
 COPY etc/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 COPY etc/nginx-overpass.conf.template /etc/nginx/nginx.conf.template
 
+# Copy scripts files and give them permissions
 COPY bin/update_overpass.sh \
     bin/update_overpass_loop.sh \
     bin/dispatcher_start.sh \

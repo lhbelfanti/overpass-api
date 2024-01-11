@@ -43,7 +43,7 @@ if [[ ! -f /db/init_done ]]; then
   # for `file:///` scheme curl returns `000` HTTP status code
   if [[ $CURL_STATUS_CODE = "200" || $CURL_STATUS_CODE = "000" ]]; then
     (
-      EXTENSION=echo "${OVERPASS_PLANET_URL}##*."
+      EXTENSION=echo "${OVERPASS_PLANET_URL##*.}"
       # if extension is pbf, convert to bz2
       if [[ $EXTENSION = "pbf" ]]; then
         echo "Running preprocessing commands:"
@@ -69,7 +69,7 @@ if [[ ! -f /db/init_done ]]; then
 
         # osm3s_query -- Generates areas
         echo "Generating areas..." &&
-        /opt/overpass/bin/osm3s_query --progress --rules --db-dir=/db/db </db/db/rules/areas.osm3s
+        /opt/overpass/bin/osm3s_query --progress --rules --db-dir=/db/db </opt/overpass/rules/areas.osm3s
 
         touch /db/init_done &&
         rm /db/planet.osm.bz2 &&

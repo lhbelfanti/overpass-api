@@ -5,7 +5,7 @@ version: '3.8'
 services:
   overpass:
     # specify the image here
-    image: mmd-osm-overpass-test:0.1.3
+    image: mmd-osm-overpass-test:0.1.0
     container_name: overpass
     # uncomment if you want to build the image yourself
     # build: .
@@ -15,7 +15,7 @@ services:
       # use a docker managed volume
       - overpass-db:/db
     environment:
-      - OVERPASS_PLANET_URL=http://download.openstreetmap.fr/extracts/south-america/argentina-latest.osm.pbf
+      - OVERPASS_PLANET_URL=https://download.geofabrik.de/south-america/argentina-latest.osm.pbf
       - OVERPASS_DIFF_URL=http://download.openstreetmap.fr/replication/south-america/argentina/minute/
       - OVERPASS_UPDATES_ENABLED=true
       - OVERPASS_UPDATE_SLEEP=3600
