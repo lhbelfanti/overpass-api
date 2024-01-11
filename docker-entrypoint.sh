@@ -30,7 +30,7 @@ if [[ ! -f /db/init_done ]]; then
 	echo "No database directory. Initializing"
 
   echo "# Netscape HTTP Cookie File" >/db/cookie.jar
-  echo "${OVERPASS_COOKIE_JAR_CONTENTS}" >>/db/cookie.jar
+  echo "" >>/db/cookie.jar
 	chown overpass /db/cookie.jar
 
   CURL_STATUS_CODE=$(curl -L -b /db/cookie.jar -o /db/planet.osm.bz2 -w "%{http_code}" "${OVERPASS_PLANET_URL}")
@@ -82,7 +82,7 @@ if [[ ! -f /db/init_done ]]; then
     echo "Overpass container ready to receive requests"
 
   elif [[ $CURL_STATUS_CODE = "403" ]]; then
-    echo "Access denied when downloading planet file. Check your OVERPASS_PLANET_URL and OVERPASS_COOKIE_JAR_CONTENTS"
+    echo "Access denied when downloading planet file. Check your OVERPASS_PLANET_URL, this image doesn't support authentication"
     cat /db/cookie.jar
     exit 1
   else

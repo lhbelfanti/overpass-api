@@ -79,7 +79,9 @@ RUN cd src/ \
 
 # --------------------------------------------------------------------------------------------------------------
 # - Create final image -
-FROM nginx:1.21
+FROM ubuntu:20.04
+
+ARG DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies
 RUN apt-get update -qq \
@@ -87,6 +89,7 @@ RUN apt-get update -qq \
         bash \
         curl \
         expat \
+        git \
         jq \
         libfcgi-bin \
         libicu66 \
@@ -94,6 +97,7 @@ RUN apt-get update -qq \
         libgomp1 \
         libgoogle-perftools4 \
         libpcre2-8-0 \
+        nginx \
         osmium-tool \
         python3 \
         python3-venv \
@@ -113,8 +117,8 @@ RUN addgroup overpass \
     && adduser --home /db --disabled-password --gecos overpass --ingroup overpass overpass
 
 
-RUN git clone --depth 1 https://github.com/lhbelfanti/overpass-api overpass-scripts \
-    && cd overpass-scripts
+RUN git clone --depth 1 https://github.com/lhbelfanti/overpass-api scripts \
+    && cd scripts
 
 COPY requirements.txt /opt/overpass/
 
@@ -127,28 +131,25 @@ RUN mkdir -p /db/diffs \
     /nginx \
     /docker-entrypoint-initdb.d
 
-RUN chown nginx:nginx /nginx \
-    && chown -R overpass:overpass /db
+RUN chown -R overpass:overpass /db
 
 COPY etc/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 COPY etc/nginx-overpass.conf.template /etc/nginx/nginx.conf.template
 
-COPY bin/update_overpass.sh
-    bin/update_overpass_loop.sh
-    bin/dispatcher_start.sh
-    bin/start_fcgiwarp.sh
+COPY bin/update_overpass.sh \
+    bin/update_overpass_loop.sh \
+    bin/dispatcher_start.sh \
     /opt/overpass/bin/
 
 COPY docker-entrypoint.sh docker-healthcheck.sh /opt/overpass/
 
 RUN chmod a+rx /opt/overpass/docker-entrypoint.sh  \
     /opt/overpass/bin/update_overpass.sh \
-    /opt/overpass/bin/dispatcher_start.sh \
-    /opt/overpass/bin/start_fcgiwarp.sh
+    /opt/overpass/bin/dispatcher_start.sh
 
 EXPOSE 80
 
-ENV HEALTHCHECK_START_PERIOD=${{HEALTHCHECK_START_PERIOD:-48}}
+HEALTHCHECK --start-period=48h CMD /opt/overpass/docker-healthcheck.sh
 
-HEALTHCHECK --start-period="${HEALTHCHECK_START_PERIOD}h" CMD /opt/overpass/docker-healthcheck.sh
+CMD ["/opt/overpass/docker-entrypoint.sh"]

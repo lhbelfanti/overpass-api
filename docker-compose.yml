@@ -1,0 +1,33 @@
+volumes:
+  overpass-db:
+
+version: '3.8'
+services:
+  overpass:
+    # specify the image here
+    image: mmd-osm-overpass-test:0.1.3
+    container_name: overpass
+    # uncomment if you want to build the image yourself
+    # build: .
+    ports:
+      - 12345:80
+    volumes:
+      # use a docker managed volume
+      - overpass-db:/db
+    environment:
+      - OVERPASS_PLANET_URL=http://download.openstreetmap.fr/extracts/south-america/argentina-latest.osm.pbf
+      - OVERPASS_DIFF_URL=http://download.openstreetmap.fr/replication/south-america/argentina/minute/
+      - OVERPASS_UPDATES_ENABLED=true
+      - OVERPASS_UPDATE_SLEEP=3600
+      - OVERPASS_FCGI_MAX_REQUESTS=10000
+      - OVERPASS_FCGI_MAX_ELAPSED_TIME=900
+      - OVERPASS_REGEXP_ENGINE="PCREJIT"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - curl -qf 'http://localhost/api/interpreter?data=\[out:json\];node(1);out;'
+          | jq '.generator' | grep -q Overpass | echo '' || exit 1
+      timeout: 15s
+      interval: 10s
+      retries: 3
+      start_period: 2h0m0s

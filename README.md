@@ -19,6 +19,43 @@ The main purpose of this repository is to contain all the necessary files to bui
 
 An example of the needed files was obtained from the [wiktorn/Overpass-API](https://github.com/wiktorn/Overpass-API) repository, but it was modified to be adapted to build and run the [mdd-osm/Overpass-API](https://github.com/mmd-osm/Overpass-API).
 
+## How to build and run this image
+
+After running the image the Overpass service is available in `http://localhost/api/interpreter`.
+
+The following environment variables can be used to customize the setup (some of them are from the wiktorn image, others form the mmd-osm image, and others were custom-made for this repository):
+
+**Database initialization variables:**
+- `OVERPASS_PLANET_URL` - The url of a planet file. [There are many mirrors](https://wiki.openstreetmap.org/wiki/Planet.osm) where you can download them. (e.g. http://download.openstreetmap.fr/extracts/south-america/argentina-latest.osm.pbf)
+- `OVERPASS_DIFF_URL` - The url to a diff directory for updating the instance (e.g. http://download.openstreetmap.fr/replication/south-america/argentina/minute/).
+If this variable is not set, the database won't be updated anytime, nor even during the initialization of the Overpass service, nor after the initialization process is completed. If this variable is not set, it doesn't matter what value the OVERPASS_UPDATES_ENABLED has, it will be always `false`.
+- `OVERPASS_UPDATES_ENABLED` - Set it to `true` if you want the database to be updated AFTER the initialization process is completed. It is `false` by default.
+- `OVERPASS_UPDATE_SLEEP` - Integer, the delay between updates (seconds).
+
+**Queries variables:**
+- `OVERPASS_RATE_LIMIT` - Set the maximum allowed number of concurrent accesses from a single IP address. It is `-1` by default, which means "no rate limit".
+- `OVERPASS_SPACE` - Set the memory limit for the total of all running processes. It should be defined in bytes. By default `12ll*1024*1024*1024` ~ 12gb.
+- `OVERPASS_TIME` - Set the time unit limit for the total of all running processes. It should be defined in bytes. By default `256*1024` ~ 256kb.
+- `OVERPASS_MAX_TIMEOUT` - Set the maximum timeout for queries. Global override. The sentence `[timeout:...]` of a query.
+- `OVERPASS_MAX_ELEMENT_LIMIT` - Set the maximum size permitted for a query. Global override. The sentence `[maxsize:...]` of a query.
+
+**FastCGI variables:**
+- `OVERPASS_FCGI_MAX_REQUESTS` - Number of FastCGI requests before interpreter process is being terminated (when idle).
+- `OVERPASS_FCGI_MAX_ELAPSED_TIME`: Maximum time after which FastCGI process is being terminated (when idle).
+- `OVERPASS_MAX_SPACE_LIMIT` - Maximum size of a FastCGI process's virtual memory (address space), in bytes. Default value: 2^33 (=8 GiB); memory will be unlimited when the parameter value is set to 0.
+
+**General variables:**
+- `OVERPASS_REGEXP_ENGINE` - Default regexp engine to use if none is specified in Overpass QL settings. Possible values include: POSIX, ICU, PCRE and PCREJIT. PCREJIT is recommended for best performance.
+- `OVERPASS_LOG_LEVEL` - Define transactions.log log level. Available levels: 0 (error), 1 (warn), 2 (info), 3 (debug, default value), 4 (trace).
+- `OVERPASS_SHARED_NAME_SUFFIX` - Define /dev/shm/osm3s*... shared memory file suffix, allowing multiple parallel Overpass instances on one system.
+- `OVERPASS_HEALTHCHECK` - Shell commands to execute to verify that image is healthy. `exit 1` in case of failures, `exit 0` when container is healthy. Default healthcheck queries overpass and verifies that there is response returned.
+
+⚠️ Disclaimers:
+- This image is mainly created to work for countries. It was specifically tested with the Argentina's map, and it was never meant to be tested with the complete world map. Anyway, you can try using the world map.
+- The image that is built from this repository, doesn't support the `clone` mode of Overpass. It means that each time the service is run in a new computer, the map, provided by parameter, is downloaded and the latest updates are applied to it.
+- The image doesn't support downloading maps from a mirror that requires login.
+- The compression mode of the Overpass database in this image, is `gz`.
+
 ---
 ## License
 [GNU GPLv3](https://choosealicense.com/licenses/gpl-3.0/)
