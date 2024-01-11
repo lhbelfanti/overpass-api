@@ -79,9 +79,9 @@ RUN cd src/ \
 
 # --------------------------------------------------------------------------------------------------------------
 # - Create final image -
-FROM ubuntu:20.04
+FROM nginx:1.21
 
-ARG DEBIAN_FRONTEND=noninteractive
+#ARG DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies
 RUN apt-get update -qq \
@@ -92,7 +92,6 @@ RUN apt-get update -qq \
         git \
         jq \
         libfcgi-bin \
-        libicu66 \
         liblz4-1 \
         libgomp1 \
         libgoogle-perftools4 \
@@ -106,6 +105,10 @@ RUN apt-get update -qq \
         zlib1g  \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+RUN wget http://archive.ubuntu.com/ubuntu/pool/main/i/icu/libicu66_66.1-2ubuntu2_amd64.deb \
+    && dpkg -i libicu66_66.1-2ubuntu2_amd64.deb \
+    && rm libicu66_66.1-2ubuntu2_amd64.deb
 
 # Copy binaries and rules
 COPY --from=builder /root/overpass/bin /opt/overpass/bin
@@ -131,7 +134,8 @@ RUN mkdir -p /db/diffs \
     /nginx \
     /docker-entrypoint-initdb.d
 
-RUN chown -R overpass:overpass /db
+RUN chown nginx:nginx /nginx \
+    && chown -R overpass:overpass /db
 
 COPY etc/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
