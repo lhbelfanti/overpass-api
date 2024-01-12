@@ -34,7 +34,7 @@ if [[ ! -f /db/init_done ]]; then
   echo "" >>/db/cookie.jar
 	chown overpass /db/cookie.jar
 
-  echo "Downloading planet file $(curl -L -b /db/cookie.jar -o "${PLANET_FILE_PATH}" -w "%{http_code}" "${OVERPASS_PLANET_URL}")"
+  echo "Downloading planet file"
   CURL_STATUS_CODE=$(curl -L -b /db/cookie.jar -o "${PLANET_FILE_PATH}" -w "%{http_code}" "${OVERPASS_PLANET_URL}")
   # try again until it's allowed
   while [ "$CURL_STATUS_CODE" = "429" ]; do
@@ -49,7 +49,7 @@ if [[ ! -f /db/init_done ]]; then
       # update_overpass -- Updates database
       # osm3s_query -- Generates areas
       echo "Creating database" \
-      && /opt/overpass/bin/init_osm3s.sh "${PLANET_FILE_PATH}" /db/db /opt/overpass/bin/ \
+      && /opt/overpass/bin/init_osm3s.sh "${PLANET_FILE_PATH}" /db/db /opt/overpass \
         --version="$(osmium fileinfo -e -g data.timestamp.last "${PLANET_FILE_PATH}")" \
         --compression-method=gz \
         --map-compression-method=gz \
