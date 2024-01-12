@@ -34,7 +34,8 @@ if [[ ! -f /db/init_done ]]; then
   echo "" >>/db/cookie.jar
 	chown overpass /db/cookie.jar
 
-  echo "Downloading planet file"
+  echo "Downloading planet file: ${OVERPASS_PLANET_URL}"
+  EXTENSION=$(echo "${OVERPASS_PLANET_URL##*.}")
   CURL_STATUS_CODE=$(curl -L -b /db/cookie.jar -o "${PLANET_FILE_PATH}" -w "%{http_code}" "${OVERPASS_PLANET_URL}")
   # try again until it's allowed
   while [ "$CURL_STATUS_CODE" = "429" ]; do
@@ -45,6 +46,18 @@ if [[ ! -f /db/init_done ]]; then
   # for `file:///` scheme curl returns `000` HTTP status code
   if [[ $CURL_STATUS_CODE = "200" || $CURL_STATUS_CODE = "000" ]]; then
     (
+      if [[ $EXTENSION = "pbf" ]]; then
+        echo "Running preprocessing commands:"
+
+        echo "mv /db/planet.osm.bz2 /db/planet.osm.pbf"
+        mv /db/planet.osm.bz2 /db/planet.osm.pbf
+
+        echo "osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf"
+        osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf
+
+        echo "rm /db/planet.osm.pbf"
+        rm /db/planet.osm.pbf
+      fi &&
       # init_osm3s -- Creates database
       # update_overpass -- Updates database
       # osm3s_query -- Generates areas
