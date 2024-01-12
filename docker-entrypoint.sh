@@ -34,6 +34,7 @@ if [[ ! -f /db/init_done ]]; then
   echo "" >>/db/cookie.jar
 	chown overpass /db/cookie.jar
 
+  echo "Downloading planet file $(curl -L -b /db/cookie.jar -o "${PLANET_FILE_PATH}" -w "%{http_code}" "${OVERPASS_PLANET_URL}")"
   CURL_STATUS_CODE=$(curl -L -b /db/cookie.jar -o "${PLANET_FILE_PATH}" -w "%{http_code}" "${OVERPASS_PLANET_URL}")
   # try again until it's allowed
   while [ "$CURL_STATUS_CODE" = "429" ]; do
@@ -44,43 +45,30 @@ if [[ ! -f /db/init_done ]]; then
   # for `file:///` scheme curl returns `000` HTTP status code
   if [[ $CURL_STATUS_CODE = "200" || $CURL_STATUS_CODE = "000" ]]; then
     (
-#      EXTENSION=echo "${OVERPASS_PLANET_URL##*.}"
-      # if extension is pbf, convert to bz2
-#      if [[ $EXTENSION = "pbf" ]]; then
-#        echo "Running preprocessing commands:"
-#
-#        echo "mv /db/planet.osm.bz2 /db/planet.osm.pbf"
-#        mv /db/planet.osm.bz2 /db/planet.osm.pbf
-#
-#        echo "osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf"
-#        osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf
-#
-#        echo "rm /db/planet.osm.pbf"
-#        rm /db/planet.osm.pbf
-#      fi &&
-        # init_osm3s -- Creates database
-        /opt/overpass/bin/init_osm3s.sh "${PLANET_FILE_PATH}" /db/db /opt/overpass/bin/ \
-          --version="$(osmium fileinfo -e -g data.timestamp.last ${PLANET_FILE_PATH})" \
-          --compression-method=gz \
-          --map-compression-method=gz \
-          --flush-size=${OVERPASS_FLUSH_SIZE} \
-          --input-format=pbf \
-          --use-osmium \
-        && echo "Database created. Now updating it." \
-        && cp -r /opt/overpass/rules /db/db \
-        && chown -R overpass:overpass /db/* &&
-
-        # update_overpass -- Updates database
-        echo "Updating" &&
-        /opt/overpass/bin/update_overpass.sh -O "${PLANET_FILE_PATH}" &&
-
-        # osm3s_query -- Generates areas
-        echo "Generating areas..." &&
-        /opt/overpass/bin/osm3s_query --progress --rules --db-dir=/db/db </db/db/rules/areas.osm3s
-
-        touch /db/init_done &&
-        rm "${PLANET_FILE_PATH}" &&
-        chown -R overpass:overpass /db/*
+      # init_osm3s -- Creates database
+      # update_overpass -- Updates database
+      # osm3s_query -- Generates areas
+      echo "Creating database" \
+      && /opt/overpass/bin/init_osm3s.sh "${PLANET_FILE_PATH}" /db/db /opt/overpass/bin/ \
+        --version="$(osmium fileinfo -e -g data.timestamp.last "${PLANET_FILE_PATH}")" \
+        --compression-method=gz \
+        --map-compression-method=gz \
+        --flush-size=${OVERPASS_FLUSH_SIZE} \
+        --input-format=pbf \
+        --use-osmium \
+      && echo "Database created. Now updating it." \
+      && cp -r /opt/overpass/rules /db/db \
+      && chown -R overpass:overpass /db/* \
+      && echo "Updating database" \
+      && /opt/overpass/bin/update_overpass.sh -O "${PLANET_FILE_PATH}" \
+      && echo "Generating areas..." \
+      && /opt/overpass/bin/osm3s_query --progress --rules --db-dir=/db/db </db/db/rules/areas.osm3s \
+      && echo "Adding /db/init_done file" \
+      && touch /db/init_done \
+      && echo "Removing downloaded planet file ${PLANET_FILE_PATH}" \
+      && rm "${PLANET_FILE_PATH}" \
+      && echo "Running chown -R overpass:overpass /db/*" \
+      && chown -R overpass:overpass /db/*
     ) || (
       echo "Failed to process planet file"
       exit 1
@@ -97,6 +85,8 @@ if [[ ! -f /db/init_done ]]; then
     cat "${PLANET_FILE_PATH}"
     exit 1
   fi
+else
+  echo "Database already initialized. If it is an error, delete the /db/init_done file to run the download process again"
 fi
 
 # shellcheck disable=SC2016 # ignore SC2016 (variables within single quotes) as this is exactly what we want to do here

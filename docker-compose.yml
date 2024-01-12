@@ -5,7 +5,7 @@ version: '3.8'
 services:
   overpass:
     # specify the image here
-    image: mmd-osm-overpass-test:0.1.0
+    image: lhbelfanti/overpass-api:0.1.0
     container_name: overpass
     # uncomment if you want to build the image yourself
     # build: .
@@ -21,7 +21,7 @@ services:
       - OVERPASS_UPDATE_SLEEP=3600
       - OVERPASS_FCGI_MAX_REQUESTS=10000
       - OVERPASS_FCGI_MAX_ELAPSED_TIME=900
-      - OVERPASS_REGEXP_ENGINE="PCREJIT"
+      - OVERPASS_REGEXP_ENGINE=PCREJIT
     healthcheck:
       test:
         - CMD-SHELL
