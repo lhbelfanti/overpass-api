@@ -36,7 +36,7 @@ If this variable is not set, the database won't be updated anytime, nor even dur
 - `OVERPASS_RATE_LIMIT` - Set the maximum allowed number of concurrent accesses from a single IP address. It is `-1` by default, which means "no rate limit".
 - `OVERPASS_SPACE` - Set the memory limit for the total of all running processes. It should be defined in bytes. By default `12ll*1024*1024*1024` ~ 12gb.
 - `OVERPASS_TIME` - Set the time unit limit for the total of all running processes. It should be defined in bytes. By default `256*1024` ~ 256kb.
-- `OVERPASS_MAX_TIMEOUT` - Set the maximum timeout for queries. Global override. The sentence `[timeout:...]` of a query.
+- `OVERPASS_MAX_TIMEOUT` - Set the maximum timeout for queries. Global override. The sentence `[timeout:...]` of a query. By default is 1000.
 - `OVERPASS_MAX_ELEMENT_LIMIT` - Set the maximum size permitted for a query. Global override. The sentence `[maxsize:...]` of a query.
 
 **FastCGI variables:**

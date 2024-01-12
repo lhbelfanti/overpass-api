@@ -4,6 +4,7 @@ set -eo pipefail
 shopt -s nullglob
 
 OVERPASS_FLUSH_SIZE=16
+PLANET_FILE_PATH=/db/planet.osm.pbf
 
 # this is used by other processes, so needs to be exported
 export OVERPASS_MAX_TIMEOUT=${OVERPASS_MAX_TIMEOUT:-1000s}
@@ -33,46 +34,52 @@ if [[ ! -f /db/init_done ]]; then
   echo "" >>/db/cookie.jar
 	chown overpass /db/cookie.jar
 
-  CURL_STATUS_CODE=$(curl -L -b /db/cookie.jar -o /db/planet.osm.bz2 -w "%{http_code}" "${OVERPASS_PLANET_URL}")
+  CURL_STATUS_CODE=$(curl -L -b /db/cookie.jar -o "${PLANET_FILE_PATH}" -w "%{http_code}" "${OVERPASS_PLANET_URL}")
   # try again until it's allowed
   while [ "$CURL_STATUS_CODE" = "429" ]; do
     echo "Server responded with 429 Too many requests. Trying again in 5 minutes..."
     sleep 300
-    CURL_STATUS_CODE=$(curl -L -b /db/cookie.jar -o /db/planet.osm.bz2 -w "%{http_code}" "${OVERPASS_PLANET_URL}")
+    CURL_STATUS_CODE=$(curl -L -b /db/cookie.jar -o "${PLANET_FILE_PATH}" -w "%{http_code}" "${OVERPASS_PLANET_URL}")
   done
   # for `file:///` scheme curl returns `000` HTTP status code
   if [[ $CURL_STATUS_CODE = "200" || $CURL_STATUS_CODE = "000" ]]; then
     (
-      EXTENSION=echo "${OVERPASS_PLANET_URL##*.}"
+#      EXTENSION=echo "${OVERPASS_PLANET_URL##*.}"
       # if extension is pbf, convert to bz2
-      if [[ $EXTENSION = "pbf" ]]; then
-        echo "Running preprocessing commands:"
-
-        echo "mv /db/planet.osm.bz2 /db/planet.osm.pbf"
-        mv /db/planet.osm.bz2 /db/planet.osm.pbf
-
-        echo "osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf"
-        osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf
-
-        echo "rm /db/planet.osm.pbf"
-        rm /db/planet.osm.pbf
-      fi &&
+#      if [[ $EXTENSION = "pbf" ]]; then
+#        echo "Running preprocessing commands:"
+#
+#        echo "mv /db/planet.osm.bz2 /db/planet.osm.pbf"
+#        mv /db/planet.osm.bz2 /db/planet.osm.pbf
+#
+#        echo "osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf"
+#        osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf
+#
+#        echo "rm /db/planet.osm.pbf"
+#        rm /db/planet.osm.pbf
+#      fi &&
         # init_osm3s -- Creates database
-        /opt/overpass/bin/init_osm3s.sh /db/planet.osm.bz2 /db/db /opt/overpass "--version=$(osmium fileinfo -e -g data.timestamp.last /db/planet.osm.bz2) --compression-method=gz --map-compression-method=gz --flush-size=${OVERPASS_FLUSH_SIZE}" &&
-        echo "Database created. Now updating it." &&
-        cp -r /opt/overpass/rules /db/db &&
-        chown -R overpass:overpass /db/* &&
+        /opt/overpass/bin/init_osm3s.sh "${PLANET_FILE_PATH}" /db/db /opt/overpass/bin/ \
+          --version="$(osmium fileinfo -e -g data.timestamp.last ${PLANET_FILE_PATH})" \
+          --compression-method=gz \
+          --map-compression-method=gz \
+          --flush-size=${OVERPASS_FLUSH_SIZE} \
+          --input-format=pbf \
+          --use-osmium \
+        && echo "Database created. Now updating it." \
+        && cp -r /opt/overpass/rules /db/db \
+        && chown -R overpass:overpass /db/* &&
 
         # update_overpass -- Updates database
         echo "Updating" &&
-        /opt/overpass/bin/update_overpass.sh -O /db/planet.osm.bz2 &&
+        /opt/overpass/bin/update_overpass.sh -O "${PLANET_FILE_PATH}" &&
 
         # osm3s_query -- Generates areas
         echo "Generating areas..." &&
-        /opt/overpass/bin/osm3s_query --progress --rules --db-dir=/db/db </opt/overpass/rules/areas.osm3s
+        /opt/overpass/bin/osm3s_query --progress --rules --db-dir=/db/db </db/db/rules/areas.osm3s
 
         touch /db/init_done &&
-        rm /db/planet.osm.bz2 &&
+        rm "${PLANET_FILE_PATH}" &&
         chown -R overpass:overpass /db/*
     ) || (
       echo "Failed to process planet file"
@@ -87,7 +94,7 @@ if [[ ! -f /db/init_done ]]; then
     exit 1
   else
     echo "Failed to download planet file. HTTP status code: ${CURL_STATUS_CODE}"
-    cat /db/planet.osm.bz2
+    cat "${PLANET_FILE_PATH}"
     exit 1
   fi
 fi

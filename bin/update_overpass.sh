@@ -44,8 +44,17 @@ fi
 		if [[ -s ${DIFF_FILE} ]]; then
 			VERSION=$(osmium fileinfo -e -g data.timestamp.last "${DIFF_FILE}" || (cp -f /db/replicate_id.backup /db/replicate_id && echo "Broken file" && cat "${DIFF_FILE}" && rm -f "${DIFF_FILE}" && exit 1))
 			if [[ -n "${VERSION// /}" ]]; then
-				echo /opt/overpass/bin/update_from_dir --osc-dir="$(dirname ${DIFF_FILE})" --version="${VERSION}" "${UPDATE_ARGS[@]}"
-				/opt/overpass/bin/update_from_dir --osc-dir="$(dirname ${DIFF_FILE})" --version="${VERSION}" "${UPDATE_ARGS[@]}"
+				echo /opt/overpass/bin/update_from_dir \
+          --osc-dir="$(dirname ${DIFF_FILE})" \
+          --version="${VERSION}" \
+          --use-osmium \
+          "${UPDATE_ARGS[@]}"
+
+				/opt/overpass/bin/update_from_dir \
+          --osc-dir="$(dirname ${DIFF_FILE})" \
+          --version="${VERSION}" \
+          --use-osmium \
+          "${UPDATE_ARGS[@]}"
 			else
 				echo "Empty version, skipping file"
 				cat "${DIFF_FILE}"
