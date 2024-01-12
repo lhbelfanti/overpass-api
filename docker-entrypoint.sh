@@ -4,7 +4,7 @@ set -eo pipefail
 shopt -s nullglob
 
 OVERPASS_FLUSH_SIZE=16
-PLANET_FILE_PATH=/db/planet.osm.pbf
+PLANET_FILE_PATH=/db/planet.osm.bz2
 
 # this is used by other processes, so needs to be exported
 export OVERPASS_MAX_TIMEOUT=${OVERPASS_MAX_TIMEOUT:-1000s}
@@ -49,11 +49,11 @@ if [[ ! -f /db/init_done ]]; then
       if [[ $EXTENSION = "pbf" ]]; then
         echo "Running preprocessing commands:"
 
-        echo "mv /db/planet.osm.bz2 /db/planet.osm.pbf"
-        mv /db/planet.osm.bz2 /db/planet.osm.pbf
+        echo "mv ${PLANET_FILE_PATH} /db/planet.osm.pbf"
+        mv "${PLANET_FILE_PATH}" /db/planet.osm.pbf
 
-        echo "osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf"
-        osmium cat -o /db/planet.osm.bz2 /db/planet.osm.pbf
+        echo "osmium cat -o ${PLANET_FILE_PATH} /db/planet.osm.pbf"
+        osmium cat -o "${PLANET_FILE_PATH}" /db/planet.osm.pbf
 
         echo "rm /db/planet.osm.pbf"
         rm /db/planet.osm.pbf
@@ -67,7 +67,6 @@ if [[ ! -f /db/init_done ]]; then
         --compression-method=gz \
         --map-compression-method=gz \
         --flush-size=${OVERPASS_FLUSH_SIZE} \
-        --input-format=pbf \
         --use-osmium \
       && echo "Database created. Now updating it." \
       && cp -r /opt/overpass/rules /db/db \
