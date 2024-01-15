@@ -80,7 +80,7 @@ RUN cd src/ \
 
 # --------------------------------------------------------------------------------------------------------------
 # - Create final image -
-FROM nginx:1.25.3
+FROM nginx:1.21
 
 #ARG DEBIAN_FRONTEND=noninteractive
 
