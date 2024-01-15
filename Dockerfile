@@ -80,7 +80,7 @@ RUN cd src/ \
 
 # --------------------------------------------------------------------------------------------------------------
 # - Create final image -
-FROM nginx:1.21
+FROM nginx:1.25.3
 
 #ARG DEBIAN_FRONTEND=noninteractive
 
@@ -151,7 +151,7 @@ COPY bin/update_overpass.sh \
     bin/update_overpass_loop.sh \
     bin/rules_loop.sh \
     bin/dispatcher_start.sh \
-    bin/start_fcgiwarp.sh \
+    bin/start_fcgiwrap.sh \
     /opt/overpass/bin/
 
 COPY docker-entrypoint.sh docker-healthcheck.sh /opt/overpass/
@@ -160,7 +160,7 @@ RUN chmod a+rx /opt/overpass/docker-entrypoint.sh  \
     /opt/overpass/bin/update_overpass.sh \
     /opt/overpass/bin/rules_loop.sh \
     /opt/overpass/bin/dispatcher_start.sh \
-    /opt/overpass/bin/start_fcgiwarp.sh
+    /opt/overpass/bin/start_fcgiwrap.sh
 
 EXPOSE 80
 
