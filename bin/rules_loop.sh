@@ -35,7 +35,7 @@ fi
 
 pushd "$EXEC_DIR" || exit 1
 
-while [[ true ]]; do
+while true; do
 {
   echo "date '+%F %T': update started" >>$DB_DIR/rules_loop.log
   ./osm3s_query --progress --rules <$DB_DIR/rules/areas.osm3s

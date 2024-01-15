@@ -104,8 +104,9 @@ if [[ ! -f /db/init_done ]]; then
       echo "Failed to process planet file"
       exit 1
     )
-
+    echo ""
     echo "Overpass container ready to receive requests"
+    echo ""
 
   elif [[ $CURL_STATUS_CODE = "403" ]]; then
     echo "Access denied when downloading planet file. Check your OVERPASS_PLANET_URL, this image doesn't support authentication"
@@ -117,7 +118,9 @@ if [[ ! -f /db/init_done ]]; then
     exit 1
   fi
 else
+  echo ""
   echo "Database already initialized. If it is an error, delete the /db/init_done file to run the download process again"
+  echo ""
 fi
 
 # shellcheck disable=SC2016 # ignore SC2016 (variables within single quotes) as this is exactly what we want to do here

@@ -1,6 +1,5 @@
 #!/bin/bash
 DIFF_FILE=/db/diffs/changes.osc
-
 OVERPASS_FLUSH_SIZE=16
 
 if [ -z "$OVERPASS_DIFF_URL" ]; then
