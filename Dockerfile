@@ -10,6 +10,7 @@ RUN apt-get update -qq \
         automake \
         ca-certificates  \
         expat \
+        fcgiwrap \
         g++ \
         git \
         libexpat1-dev \
