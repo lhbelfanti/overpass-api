@@ -82,8 +82,6 @@ RUN cd src/ \
 # - Create final image -
 FROM nginx:1.21
 
-#ARG DEBIAN_FRONTEND=noninteractive
-
 # Install dependencies
 RUN apt-get update -qq \
     && apt-get install --no-install-recommends -y \
