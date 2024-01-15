@@ -147,14 +147,18 @@ COPY etc/nginx-overpass.conf.template /etc/nginx/nginx.conf.template
 # Copy scripts files and give them permissions
 COPY bin/update_overpass.sh \
     bin/update_overpass_loop.sh \
+    bin/rules_loop.sh \
     bin/dispatcher_start.sh \
+    bin/start_fcgiwarp.sh \
     /opt/overpass/bin/
 
 COPY docker-entrypoint.sh docker-healthcheck.sh /opt/overpass/
 
 RUN chmod a+rx /opt/overpass/docker-entrypoint.sh  \
     /opt/overpass/bin/update_overpass.sh \
-    /opt/overpass/bin/dispatcher_start.sh
+    /opt/overpass/bin/rules_loop.sh \
+    /opt/overpass/bin/dispatcher_start.sh \
+    /opt/overpass/bin/start_fcgiwarp.sh
 
 EXPOSE 80
 
