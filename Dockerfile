@@ -162,6 +162,4 @@ RUN chmod a+rx /opt/overpass/docker-entrypoint.sh  \
 
 EXPOSE 80
 
-HEALTHCHECK --start-period=48h CMD /opt/overpass/docker-healthcheck.sh
-
 CMD ["/opt/overpass/docker-entrypoint.sh"]

@@ -5,19 +5,18 @@ version: '3.8'
 services:
   overpass:
     # specify the image here
-    image: lhbelfanti/overpass-api:0.1.0
+    image: lhbelfanti/overpass-api:1.0.0
     container_name: overpass
-    # uncomment if you want to build the image yourself
-    # build: .
+    build: .
     ports:
       - 12345:80
     volumes:
       # use a docker managed volume
       - overpass-db:/db
     environment:
-      - OVERPASS_PLANET_URL=https://download.geofabrik.de/south-america/argentina-latest.osm.pbf
+      - OVERPASS_PLANET_URL=http://download.geofabrik.de/south-america/argentina-latest.osm.pbf
       - OVERPASS_DIFF_URL=http://download.openstreetmap.fr/replication/south-america/argentina/minute/
-      - OVERPASS_UPDATES_ENABLED=true
+      - OVERPASS_UPDATES_ENABLED=false
       - OVERPASS_UPDATE_SLEEP=3600
       - OVERPASS_FCGI_MAX_REQUESTS=10000
       - OVERPASS_FCGI_MAX_ELAPSED_TIME=900

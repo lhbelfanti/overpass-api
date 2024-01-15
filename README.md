@@ -21,15 +21,27 @@ An example of the needed files was obtained from the [wiktorn/Overpass-API](http
 
 ## How to build and run this image
 
-After running the image the Overpass service is available in `http://localhost/api/interpreter`.
+### Build
 
-The following environment variables can be used to customize the setup (some of them are from the wiktorn image, others form the mmd-osm image, and others were custom-made for this repository):
+To build the image just navigate to the root of this project and simply run `docker build -t <tag_name> .` (don't forget the `.` of the end), i.e.: `docker build -t lhbelfanti/overpass-api:1.0.0`
+
+It will take a while, but after it's done, you are ready to run the image.
+
+### Run
+
+> After running the image the Overpass service is available in `http://localhost/api/interpreter`.
+
+To run the image, in the `docker-compose.yml`, replace the `image` property by the image built, i.e.: `lhbelfanti/overpass-api:1.0.0`.
+
+Then, configure the environment variables. And lastly run `docker-compose up`.
+
+The following environment variables can be used to customize the setup (some of them were taken from the wiktorn image, others form the mmd-osm image, and others were custom-made for this repository):
 
 **Database initialization variables:**
 - `OVERPASS_PLANET_URL` - The url of a planet file. [There are many mirrors](https://wiki.openstreetmap.org/wiki/Planet.osm) where you can download them. (e.g. http://download.openstreetmap.fr/extracts/south-america/argentina-latest.osm.pbf)
 - `OVERPASS_DIFF_URL` - The url to a diff directory for updating the instance (e.g. http://download.openstreetmap.fr/replication/south-america/argentina/minute/).
-If this variable is not set, the database won't be updated anytime, nor even during the initialization of the Overpass service, nor after the initialization process is completed. If this variable is not set, it doesn't matter what value the OVERPASS_UPDATES_ENABLED has, it will be always `"NO"`.
-- `OVERPASS_UPDATES_ENABLED` - Set it to `"YES"` if you want the database to be updated **AFTER** the initialization process is completed. Set it to `"NO"` if you don't want the database to be updated **AFTER** the initialization process is completed.
+If this variable is not set, the database won't be updated anytime, nor even during the initialization of the Overpass service, nor after the initialization process is completed.
+- `OVERPASS_UPDATES_ENABLED` - **⚠️ MANDATORY VARIABLE**: Set it to `true` if you want the database to be updated **AFTER** the initialization process is completed. Set it to `false` if you don't want the database to be updated **AFTER** the initialization process is completed.
 - `OVERPASS_UPDATE_SLEEP` - Integer, the delay between updates (seconds).
 
 **Queries variables:**
@@ -50,11 +62,12 @@ If this variable is not set, the database won't be updated anytime, nor even dur
 - `OVERPASS_SHARED_NAME_SUFFIX` - Define /dev/shm/osm3s*... shared memory file suffix, allowing multiple parallel Overpass instances on one system.
 - `OVERPASS_HEALTHCHECK` - Shell commands to execute to verify that image is healthy. `exit 1` in case of failures, `exit 0` when container is healthy. Default healthcheck queries overpass and verifies that there is response returned.
 
-⚠️ Disclaimers:
+#### ⚠️ Disclaimers:
 - This image is mainly created to work for countries. It was specifically tested with the Argentina's map, and it was never meant to be tested with the complete world map. Anyway, you can try using the world map.
 - The image that is built from this repository, doesn't support the `clone` mode of Overpass. It means that each time the service is run in a new computer, the map, provided by parameter, is downloaded and the latest updates are applied to it.
 - The image doesn't support downloading maps from a mirror that requires login.
-- The compression mode of the Overpass database in this image, is `gz`.
+- The compression mode of the Overpass database in this image, is set to `gz`.
+- 
 
 ---
 ## License
