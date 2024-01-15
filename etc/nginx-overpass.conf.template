@@ -55,7 +55,7 @@ http {
             include        /etc/nginx/fastcgi_params;
             fastcgi_param  SCRIPT_FILENAME  /opt/overpass/$fastcgi_script_name;
             fastcgi_param  PATH_INFO        $fastcgi_path_info;
-            fastcgi_pass   unix:/nginx/interpreter.socket;
+            fastcgi_pass   unix:/nginx/fcgiwrap.socket;
             fastcgi_read_timeout ${OVERPASS_MAX_TIMEOUT};
             fastcgi_send_timeout ${OVERPASS_MAX_TIMEOUT};
 		}

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright 2008, 2009, 2010, 2011, 2012 Roland Olbricht
+# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Roland Olbricht et al.
 #
 # This file is part of Overpass_API.
 #
@@ -15,38 +15,30 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU Affero General Public License
-# along with Overpass_API.  If not, see <http://www.gnu.org/licenses/>.
+# along with Overpass_API. If not, see <https://www.gnu.org/licenses/>.
 
-if [[ -z $1 ]]; then
-	{
-		echo "Usage: $0 database_dir [desired_cpu_load]"
-		exit 0
-	}
+if [[ -z $1  ]]; then
+{
+  echo Usage: $0 database_dir
+  exit 0
+};
 fi
 
-CPU_LOAD=${2:-100}
-DB_DIR="$(pwd)/$1"
+DB_DIR="pwd/$1"
 
-EXEC_DIR="$(dirname "$0")/"
+EXEC_DIR="dirname $0/"
 if [[ ! ${EXEC_DIR:0:1} == "/" ]]; then
-	{
-		EXEC_DIR="$(pwd)/$EXEC_DIR"
-	}
+{
+  EXEC_DIR="pwd/$EXEC_DIR"
+};
 fi
 
-pushd "$EXEC_DIR" || exit 1
+pushd "$EXEC_DIR"
 
-while true; do
-	{
-		START=$(date +%s)
-		echo "$(date '+%F %T'): update started" >>"$DB_DIR/rules_loop.log"
-		./osm3s_query --progress --rules <"$DB_DIR/rules/areas.osm3s"
-		echo "$(date '+%F %T'): update finished" >>"$DB_DIR/rules_loop.log"
-		WORK_TIME=$(($(date +%s) - START))
-		SLEEP_TIME=$((WORK_TIME * 100 / CPU_LOAD - WORK_TIME))
-		# let SLEEP_TIME be at least 3 seconds
-		SLEEP_TIME=$((SLEEP_TIME < 3 ? 3 : SLEEP_TIME))
-		echo "It took $WORK_TIME to run the loop. Desired load is: ${CPU_LOAD}%. Sleeping: $SLEEP_TIME"
-		sleep "$SLEEP_TIME"
-	}
-done
+while [[ true ]]; do
+{
+  echo "date '+%F %T': update started" >>$DB_DIR/rules_loop.log
+  ./osm3s_query --progress --rules <$DB_DIR/rules/areas.osm3s
+  echo "date '+%F %T': update finished" >>$DB_DIR/rules_loop.log
+  sleep 3
+}; done

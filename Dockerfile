@@ -90,6 +90,7 @@ RUN apt-get update -qq \
         bzip2 \
         curl \
         expat \
+        fcgiwrap \
         git \
         jq \
         libfcgi-bin \
