@@ -41,7 +41,7 @@ The following environment variables can be used to customize the setup (some of 
 - `OVERPASS_PLANET_URL` - The url of a planet file. [There are many mirrors](https://wiki.openstreetmap.org/wiki/Planet.osm) where you can download them. (e.g. http://download.openstreetmap.fr/extracts/south-america/argentina-latest.osm.pbf)
 - `OVERPASS_DIFF_URL` - The url to a diff directory for updating the instance (e.g. http://download.openstreetmap.fr/replication/south-america/argentina/minute/).
 If this variable is not set, the database won't be updated anytime, nor even during the initialization of the Overpass service, nor after the initialization process is completed.
-- `OVERPASS_UPDATES_ENABLED` - **⚠️ MANDATORY VARIABLE**: Set it to `true` if you want the database to be updated **AFTER** the initialization process is completed. Set it to `false` if you don't want the database to be updated **AFTER** the initialization process is completed.
+- `OVERPASS_UPDATES_ENABLED` - **⚠️ MANDATORY VARIABLE**: Set it to `true` (or `1`) if you want the database to be updated **AFTER** the initialization process is completed. Set it to `false` (or `0`) if you don't want the database to be updated **AFTER** the initialization process is completed.
 - `OVERPASS_UPDATE_SLEEP` - Integer, the delay between updates (seconds).
 
 **Queries variables:**

@@ -16,7 +16,7 @@ services:
     environment:
       - OVERPASS_PLANET_URL=http://download.geofabrik.de/south-america/argentina-latest.osm.pbf
       - OVERPASS_DIFF_URL=http://download.openstreetmap.fr/replication/south-america/argentina/minute/
-      - OVERPASS_UPDATES_ENABLED=false
+      - OVERPASS_UPDATES_ENABLED=0
       - OVERPASS_UPDATE_SLEEP=3600
       - OVERPASS_FCGI_MAX_REQUESTS=10000
       - OVERPASS_FCGI_MAX_ELAPSED_TIME=900
