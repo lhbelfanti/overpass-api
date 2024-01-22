@@ -89,10 +89,14 @@ if [[ ! -f /db/init_done ]]; then
         --use-osmium \
       && echo "Database created. Now updating it." \
       && cp -r /opt/overpass/rules /db/db \
-      && chown -R overpass:overpass /db/* \
-      && echo "Updating database" \
-      && /opt/overpass/bin/update_overpass.sh -O "${PLANET_FILE_PATH}" \
-      && echo "Generating areas..." \
+      && chown -R overpass:overpass /db/* && \
+      if [[ "$OVERPASS_UPDATES_ENABLED" = "1" ]]; then
+        echo "Updating database" \
+        /opt/overpass/bin/update_overpass.sh -O "${PLANET_FILE_PATH}"
+      else
+        echo "The database will not be updated due the value of the env variable OVERPASS_UPDATES_ENABLED=$OVERPASS_UPDATES_ENABLED"
+      fi &&
+      echo "Generating areas..." \
       && /opt/overpass/bin/osm3s_query --progress --rules --db-dir=/db/db </db/db/rules/areas.osm3s \
       && echo "Adding /db/init_done file" \
       && touch /db/init_done \
