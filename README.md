@@ -43,6 +43,7 @@ The following environment variables can be used to customize the setup (some of 
 If this variable is not set, the database won't be updated anytime, nor even during the initialization of the Overpass service, nor after the initialization process is completed.
 - `OVERPASS_UPDATES_ENABLED` - **⚠️ MANDATORY VARIABLE**: Set it to `1` if you want the database to be updated with the latest diffs. Set it to `0` if you don't want the database to be updated with the latest diffs.
 - `OVERPASS_UPDATE_SLEEP` - Integer, the delay between updates (seconds).
+- `OVERPASS_STOP_AFTER_INIT` - If `false` the container will keep running after init is completed. Otherwise container will be stopped after initialization process is complete. Default `true`.
 
 **Queries variables:**
 - `OVERPASS_RATE_LIMIT` - Set the maximum allowed number of concurrent accesses from a single IP address. It is `-1` by default, which means "no rate limit".

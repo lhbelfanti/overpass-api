@@ -20,6 +20,7 @@ echo "OVERPASS_REGEXP_ENGINE=${OVERPASS_REGEXP_ENGINE}"
 echo "OVERPASS_LOG_LEVEL=${OVERPASS_LOG_LEVEL}"
 echo "OVERPASS_SHARED_NAME_SUFFIX=${OVERPASS_SHARED_NAME_SUFFIX}"
 echo "OVERPASS_HEALTHCHECK=${OVERPASS_HEALTHCHECK}"
+echo "OVERPASS_STOP_AFTER_INIT=${OVERPASS_STOP_AFTER_INIT}"
 echo ""
 
 OVERPASS_FLUSH_SIZE=16
@@ -109,7 +110,12 @@ if [[ ! -f /db/init_done ]]; then
       exit 1
     )
     echo ""
-    echo "Overpass container ready to receive requests"
+    if [[ "${OVERPASS_STOP_AFTER_INIT}" == "false" ]]; then
+      echo "Overpass container ready to receive requests"
+    else
+      echo "Overpass container initialization complete. Exiting due the value of the env variable OVERPASS_STOP_AFTER_INIT=$OVERPASS_STOP_AFTER_INIT"
+      exit 0
+    fi
     echo ""
 
   elif [[ $CURL_STATUS_CODE = "403" ]]; then
